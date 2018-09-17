@@ -1,0 +1,55 @@
+---
+title: "Assignment 1"
+author: "ningze zu"
+date: "September 17, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Document assignment
+
+```{r}
+cover_url = 'https://elgarblog.files.wordpress.com/2013/10/books1.jpg'
+if (!file.exists(cover_file <- 'cover.jpg'))
+  download.file(cover_url, cover_file, mode = 'wb')
+knitr::include_graphics(if (identical(knitr:::pandoc_to(), 'html')) cover_url else cover_file)
+```
+
+
+Consider the following situation:  
+
+A sloppy printer produces books with an average of 2 misprints per page. You want to
+know how many pages in a 50 page book will have more than k misprints. Make an n x k table that shows the probability that n or fewer pages in a 50 page book will have more than k misprints.  
+
+Show and explain your work.  Include equations and calculations to teach the reader how to solve the problem.  Include an image of a book.
+
+Push your solution to a github repository and submit the url for repository on blackboard.
+Be sure your repo includes your document as a pdf file and as an RMD file.  Include other files needed to recompile your document.
+
+Please keep in mind that the purpose of this assignment is to produce a document.  The problem was SUPPOSED to be easy.
+
+Given that the stated mean value of 2 misprints per page, assume the distribution of $X$, the number of misprints of per page is a Poisson distribution $P(\lambda)$ with $\lambda=2$. The PDF of poisson distribution is $$P(X>k)=\frac{{e^{ - \lambda } \lambda ^x }}{{x!}}$$
+Conditioned on $k$, the probability $p_k$ of or more than $k$ misprints on a page is: $$p_k=P(X>k)=1-P(X\leqslant k)=1-ppois(k, \lambda=2)$$
+Then we have the table of the probability that n or
+fewer pages in a 50 page book will have more than k misprints.
+```{r}
+library(knitr)
+n=50
+k=10
+prob <-matrix(ncol = k+1, nrow=n)
+for (i in 1:n){
+  for (j in 0:k){
+    p = ppois(j, 2, lower.tail = TRUE)
+    prob[i,j+1]=dbinom(i,50, prob = (1-p))
+  }
+  prob
+}
+prob = as.data.frame(prob)
+colnames(prob)=paste0("k=", c(0:10))
+rownames(prob)=paste0("n=", c(1:50))
+kable(prob)
+```
+
